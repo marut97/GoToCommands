@@ -4,7 +4,7 @@ using System.Threading;
 using Microsoft.VisualStudio.Shell;
 using Task = System.Threading.Tasks.Task;
 
-namespace ViewCodeExtension
+namespace GoToHeaderCode
 {
     /// <summary>
     /// This is the class that implements the package exposed by this assembly.
@@ -24,16 +24,20 @@ namespace ViewCodeExtension
     /// </para>
     /// </remarks>
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
-    [Guid(ViewCodeExtensionPackage.PackageGuidString)]
+    [Guid(PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(ViewCodeSettings))]
-    public sealed class ViewCodeExtensionPackage : AsyncPackage
+    [ProvideUIContextRule(UiConstraintGuidString, // Must match the GUID in the .vsct file
+        name: "UI Context",
+        expression: "header | code", // This will make the button only show on .cpp and .h files
+        termNames: new[] { "header", "code"},
+        termValues: new[] { "HierSingleSelectionName:.h$", "HierSingleSelectionName:.cpp$" })]
+    public sealed class GoToHeaderCodePackage : AsyncPackage
     {
         /// <summary>
-        /// ViewCodeExtensionPackage GUID string.
+        /// GoToHeaderCodePackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "0b372e80-ee18-4355-9e39-dee114206ed9";
-
+        public const string PackageGuidString = "c3d00d76-588e-4441-95d6-565d132cc0bd";
+        public const string UiConstraintGuidString = "6B4C995A-47FD-4461-90A2-2048B531EBE1";
         #region Package Members
 
         /// <summary>
@@ -48,8 +52,7 @@ namespace ViewCodeExtension
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-            ViewCodeCommand.Initialize(this);
-            await ViewCodeSettingsCommand.InitializeAsync(this);
+            await GoToHeaderCode.Commands.GoToHeaderCode.InitializeAsync(this);
         }
 
         #endregion

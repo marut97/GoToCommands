@@ -15,14 +15,14 @@
         defining some of the constants that we will use inside the file. -->
 
   <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
-  <Extern href="stdidcmd.h" />
+  <Extern href="stdidcmd.h"/>
 
   <!--This header contains the command ids for the menus provided by the shell. -->
-  <Extern href="vsshlids.h" />
+  <Extern href="vsshlids.h"/>
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidViewCodeExtensionPackage">
+  <Commands package="guidGoToHeaderCodePackage">
     <!-- Inside this section we have different sub-sections: one for the menus, another
     for the menu groups, one for the buttons (the actual commands), one for the combos
     and the last one for the bitmaps used. Each element is identified by a command id that
@@ -36,8 +36,8 @@
          group as the part of a menu contained between two lines. The parent of a group
          must be a menu. -->
     <Groups>
-      <Group guid="guidViewCodeExtensionPackageCmdSet" id="ViewCodeMenuGroup" priority="0x0600">
-        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+      <Group guid="guidGoToHeaderCodePackageCmdSet" id="MyMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
       </Group>
     </Groups>
 
@@ -52,18 +52,12 @@
               <CommandFlag>DefaultInvisible</CommandFlag>
               <CommandFlag>DynamicVisibility</CommandFlag>
           If you do not want an image next to your command, remove the Icon node /> -->
-      <Button guid="guidViewCodeExtensionPackageCmdSet" id="ViewCodeCommandId" priority="0x0100" type="Button">
-        <Parent guid="guidViewCodeExtensionPackageCmdSet" id="ViewCodeMenuGroup" />
+      <Button guid="guidGoToHeaderCodePackageCmdSet" id="GoToHeaderCodeId" priority="0x0100" type="Button">
+        <Parent guid="guidGoToHeaderCodePackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
-          <ButtonText>View Code</ButtonText>
-        </Strings>
-      </Button>
-      <Button guid="guidViewCodeExtensionPackageCmdSet" id="cmdidViewCodeSettingsCommand" priority="0x0100" type="Button" Condition="">
-        <Parent guid="guidViewCodeExtensionPackageCmdSet" id="ViewCodeMenuGroup" />
-        <Icon guid="guidImages2" id="bmpPic1" />
-        <Strings>
-          <ButtonText>View Code Settings</ButtonText>
+          <ButtonText>Go To Header/Code File</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -75,42 +69,26 @@
             bitmap strip containing the bitmaps and then there are the numeric ids of the elements used
             inside a button definition. An important aspect of this declaration is that the element id
             must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-      <Bitmap guid="guidImages" href="Resources\ViewCodeCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
-      <Bitmap guid="guidImages2" href="Resources\ViewCodeSettingsCommand.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough" />
+      <Bitmap guid="guidImages" href="Resources\GoToHeaderCode.png" usedList="bmpPic1, bmpPic2, bmpPicSearch, bmpPicX, bmpPicArrows, bmpPicStrikethrough"/>
     </Bitmaps>
   </Commands>
+  
+  <VisibilityConstraints>
+    <VisibilityItem guid="guidGoToHeaderCodePackageCmdSet" id="GoToHeaderCodeId"  context="guidUIContext"/>
+  </VisibilityConstraints>
 
   <Symbols>
     <!-- This is the package guid. -->
-    <GuidSymbol name="guidViewCodeExtensionPackage" value="{0b372e80-ee18-4355-9e39-dee114206ed9}" />
+    <GuidSymbol name="guidGoToHeaderCodePackage" value="{c3d00d76-588e-4441-95d6-565d132cc0bd}" />
+    <GuidSymbol name="guidUIContext" value="{6B4C995A-47FD-4461-90A2-2048B531EBE1}" />
 
     <!-- This is the guid used to group the menu commands together -->
-    <GuidSymbol name="guidViewCodeExtensionPackageCmdSet" value="{ee1f93c0-e081-4ef4-8891-06343538812c}">
-      <IDSymbol name="ViewCodeMenuGroup" value="0x1020" />
-      <IDSymbol name="ViewCodeCommandId" value="0x0100" />
-      <IDSymbol value="4129" name="cmdidCommand" />
-      <IDSymbol value="4130" name="cmdidViewCodeSettingsCommand" />
+    <GuidSymbol name="guidGoToHeaderCodePackageCmdSet" value="{5a7dac73-7862-4f29-beae-46cea2d3d188}">
+      <IDSymbol name="MyMenuGroup" value="0x1020" />
+      <IDSymbol name="GoToHeaderCodeId" value="0x0100" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{bb5c26f2-425a-4ef8-8ae6-1dfd1339ac7f}">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
-    </GuidSymbol>
-  
-    <GuidSymbol value="{663235ac-b2d0-4173-87c2-073ce339410e}" name="guidImages1">
-      <IDSymbol name="bmpPic1" value="1" />
-      <IDSymbol name="bmpPic2" value="2" />
-      <IDSymbol name="bmpPicSearch" value="3" />
-      <IDSymbol name="bmpPicX" value="4" />
-      <IDSymbol name="bmpPicArrows" value="5" />
-      <IDSymbol name="bmpPicStrikethrough" value="6" />
-    </GuidSymbol>
-  
-    <GuidSymbol value="{267a08a4-71e1-49f0-bdf4-432652f82dd7}" name="guidImages2">
+    <GuidSymbol name="guidImages" value="{a9b2141b-8591-4ce7-b0d5-6513e0c7f368}" >
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
       <IDSymbol name="bmpPicSearch" value="3" />
