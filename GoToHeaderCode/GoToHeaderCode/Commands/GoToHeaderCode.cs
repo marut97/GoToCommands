@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
+using System.Linq;
 using EnvDTE;
 using Microsoft;
 using Microsoft.VisualStudio;
@@ -63,15 +65,48 @@ namespace GoToHeaderCode.Commands
             string relativePath = "\\..\\" + goToFolder;
 
             //var newPath = filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath + "\\" + fileName;
-            var newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName);
+            var path = filePath.Substring(filePath.LastIndexOf(currentFolder) + currentFolder.Length, filePath.Length-1- (filePath.LastIndexOf(currentFolder) + currentFolder.Length));
+            var newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName, path);
 
-            _dte.ExecuteCommand("File.OpenFile", newPath);
+            if(File.Exists(newPath))
+                _dte.ExecuteCommand("File.OpenFile", newPath);
         }
 
-        private static string FindHeaderCodeFilePath(string basePath, string fileName)
+        private static string FindHeaderCodeFilePath(string basePath, string fileName, string currentFolder)
         {
-            var files = Directory.GetFiles(basePath, fileName, SearchOption.AllDirectories);
-            return files[0];
+            var files = Directory.GetFiles(basePath, fileName, SearchOption.AllDirectories).ToList();
+
+            return HandleDuplicates(files, currentFolder);
+        }
+
+        private static string HandleDuplicates(List<string> files, string currentFolder)
+        {
+            if(files.Count > 1)
+            {
+                List<int> similarityIndex = new List<int>(files.Count);
+                for (int i = 0; i < similarityIndex.Count; i++)
+                {
+                    similarityIndex[i] = 0;
+                }
+
+                List<string> folders = currentFolder.Split('/').ToList();
+                foreach (var folderName in folders)
+                {
+                    for (int i = 0; i < files.Count; i++)
+                    {
+                        if (files[i].Contains(folderName))
+                            similarityIndex[i]++;
+                    }
+                }
+
+                var maxValueIndex = similarityIndex.IndexOf(similarityIndex.Max());
+                return files[maxValueIndex];
+            }
+
+            else if (files.Count == 1)
+                return files[0];
+
+            return "";
         }
     }
 }
