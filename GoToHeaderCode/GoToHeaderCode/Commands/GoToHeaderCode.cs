@@ -1,8 +1,11 @@
 ﻿using System;
 using System.ComponentModel.Design;
+using System.IO;
 using EnvDTE;
 using Microsoft;
+using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace GoToHeaderCode.Commands
@@ -40,7 +43,28 @@ namespace GoToHeaderCode.Commands
         private static void Execute(object sender, EventArgs e)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
-            ProjectItem item = _dte.SelectedItems.Item(1).ProjectItem;
+
+            var filePath = _dte.ActiveDocument.FullName;
+            bool header = false;
+            if (filePath.EndsWith(".h")) 
+                header = true;
+
+            var fileName = _dte.ActiveDocument.Name;
+
+
+            string goToFolder = header ? "src" : "include";
+            string currentFolder = !header ? "src" : "include";
+
+            string currentExtension = header ? ".h" : ".cpp";
+            string goToExtension = !header ? ".h" : ".cpp";
+
+            fileName = fileName.Replace(currentExtension, goToExtension);
+
+            string relativePath = "\\..\\" + goToFolder;
+
+            var newPath = filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath + "\\" + fileName;
+
+            _dte.ExecuteCommand("File.OpenFile", newPath);
         }
     }
 }
