@@ -62,9 +62,16 @@ namespace GoToHeaderCode.Commands
 
             string relativePath = "\\..\\" + goToFolder;
 
-            var newPath = filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath + "\\" + fileName;
+            //var newPath = filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath + "\\" + fileName;
+            var newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName);
 
             _dte.ExecuteCommand("File.OpenFile", newPath);
+        }
+
+        private static string FindHeaderCodeFilePath(string basePath, string fileName)
+        {
+            var files = Directory.GetFiles(basePath, fileName, SearchOption.AllDirectories);
+            return files[0];
         }
     }
 }
