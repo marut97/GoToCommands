@@ -83,13 +83,13 @@ namespace GoToHeaderCode.Commands
         {
             if(files.Count > 1)
             {
-                List<int> similarityIndex = new List<int>(files.Count);
-                for (int i = 0; i < similarityIndex.Count; i++)
+                List<int> similarityIndex = new List<int>();
+                for (int i = 0; i < files.Count; i++)
                 {
-                    similarityIndex[i] = 0;
+                    similarityIndex.Add(0);
                 }
 
-                List<string> folders = currentFolder.Split('/').ToList();
+                List<string> folders = currentFolder.Split('\\').ToList();
                 foreach (var folderName in folders)
                 {
                     for (int i = 0; i < files.Count; i++)
@@ -99,14 +99,31 @@ namespace GoToHeaderCode.Commands
                     }
                 }
 
-                var maxValueIndex = similarityIndex.IndexOf(similarityIndex.Max());
-                return files[maxValueIndex];
+                
+                return BestMatch(similarityIndex, files);
             }
 
             else if (files.Count == 1)
                 return files[0];
 
             return "";
+        }
+
+        private static string BestMatch(List<int> similarityIndex, List<string> files)
+        {
+            var maxValue = similarityIndex.Max();
+            var index = similarityIndex.IndexOf(maxValue);
+            var maxIndex = similarityIndex.LastIndexOf(maxValue);
+            var file = files[index];
+            index++;
+            while (index <= maxIndex)
+            {
+                if (file.Split('\\').Length > files[index].Split('\\').Length)
+                    file = files[index];
+
+                index++;
+            }
+            return file;
         }
     }
 }
