@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using EnvDTE;
 using Microsoft;
 using Microsoft.VisualStudio.Shell;
@@ -58,15 +59,30 @@ namespace GoToHeaderCode.Commands
             string currentExtension = header ? ".h" : ".cpp";
             string goToExtension = !header ? ".h" : ".cpp";
 
+            var newPath = filePath.Replace(currentExtension, goToExtension);
+
+            if (OpenFile(newPath))
+                return;
+
             fileName = fileName.Replace(currentExtension, goToExtension);
 
             string relativePath = "\\..\\" + goToFolder;
 
             var path = filePath.Substring(filePath.LastIndexOf(currentFolder) + currentFolder.Length, filePath.Length - 1 - (filePath.LastIndexOf(currentFolder) + currentFolder.Length));
-            var newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName, path);
+            newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName, path);
 
-            if (File.Exists(newPath))
-                _dte.ExecuteCommand("File.OpenFile", newPath);
+            if (OpenFile(newPath))
+                return;
+        }
+
+        public static bool OpenFile(string path)
+        {
+            if (File.Exists(path))
+            {
+                _dte.ExecuteCommand("File.OpenFile", path);
+                return true;
+            }
+            return false;
         }
 
         private static string FindHeaderCodeFilePath(string basePath, string fileName, string currentFolder)
