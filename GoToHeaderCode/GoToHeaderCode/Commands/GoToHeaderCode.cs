@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using EnvDTE;
 using Microsoft;
-using Microsoft.VisualStudio;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
 
 namespace GoToHeaderCode.Commands
 {
-    /// <summary>
-    /// Command handler
-    /// </summary>
+
     internal sealed class GoToHeaderCode
     {
 
@@ -47,9 +47,7 @@ namespace GoToHeaderCode.Commands
             ThreadHelper.ThrowIfNotOnUIThread();
 
             var filePath = _dte.ActiveDocument.FullName;
-            bool header = false;
-            if (filePath.EndsWith(".h")) 
-                header = true;
+            bool header = filePath.EndsWith(".h");
 
             var fileName = _dte.ActiveDocument.Name;
 
@@ -64,16 +62,18 @@ namespace GoToHeaderCode.Commands
 
             string relativePath = "\\..\\" + goToFolder;
 
-            //var newPath = filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath + "\\" + fileName;
-            var path = filePath.Substring(filePath.LastIndexOf(currentFolder) + currentFolder.Length, filePath.Length-1- (filePath.LastIndexOf(currentFolder) + currentFolder.Length));
+            var path = filePath.Substring(filePath.LastIndexOf(currentFolder) + currentFolder.Length, filePath.Length - 1 - (filePath.LastIndexOf(currentFolder) + currentFolder.Length));
             var newPath = FindHeaderCodeFilePath(filePath.Substring(0, filePath.LastIndexOf(currentFolder) + currentFolder.Length) + relativePath, fileName, path);
 
-            if(File.Exists(newPath))
+            if (File.Exists(newPath))
                 _dte.ExecuteCommand("File.OpenFile", newPath);
         }
 
         private static string FindHeaderCodeFilePath(string basePath, string fileName, string currentFolder)
         {
+            if (!Directory.Exists(basePath))
+                return "";
+
             var files = Directory.GetFiles(basePath, fileName, SearchOption.AllDirectories).ToList();
 
             return HandleDuplicates(files, currentFolder);
@@ -81,7 +81,7 @@ namespace GoToHeaderCode.Commands
 
         private static string HandleDuplicates(List<string> files, string currentFolder)
         {
-            if(files.Count > 1)
+            if (files.Count > 1)
             {
                 List<int> similarityIndex = new List<int>();
                 for (int i = 0; i < files.Count; i++)
@@ -99,7 +99,7 @@ namespace GoToHeaderCode.Commands
                     }
                 }
 
-                
+
                 return BestMatch(similarityIndex, files);
             }
 

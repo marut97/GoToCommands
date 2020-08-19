@@ -55,7 +55,6 @@
       <Button guid="guidGoToHeaderCodePackageCmdSet" id="GoToHeaderCodeId" priority="0x0100" type="Button">
         <Parent guid="guidGoToHeaderCodePackageCmdSet" id="MyMenuGroup" />
         <Icon guid="guidImages" id="bmpPic1" />
-        <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Go To Header/Code File</ButtonText>
         </Strings>
@@ -72,10 +71,6 @@
       <Bitmap guid="guidImages" href="Resources\icon.png" usedList="bmpPic1"/>
     </Bitmaps>
   </Commands>
-  
-  <VisibilityConstraints>
-    <VisibilityItem guid="guidGoToHeaderCodePackageCmdSet" id="GoToHeaderCodeId"  context="guidUIContext"/>
-  </VisibilityConstraints>
 
   <Symbols>
     <!-- This is the package guid. -->
