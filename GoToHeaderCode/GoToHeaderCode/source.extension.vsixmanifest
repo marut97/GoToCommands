@@ -1,9 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="GoToHeaderCode.b0972157-5bff-40c7-bb8e-25fcaddb13f1" Version="1.1" Language="en-US" Publisher="Marut Prasad" />
+        <Identity Id="GoToHeaderCode.b0972157-5bff-40c7-bb8e-25fcaddb13f1" Version="1.2" Language="en-US" Publisher="Marut Prasad" />
         <DisplayName>Go To Header/Code File</DisplayName>
-        <Description xml:space="preserve">Empty VSIX Project.</Description>
+        <Description xml:space="preserve">Toggle between header and code files in packages or dlls seemlessly</Description>
     </Metadata>
     <Installation>
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[14.0, 17.0)" />
