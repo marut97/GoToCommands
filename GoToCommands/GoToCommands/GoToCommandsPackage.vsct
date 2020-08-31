@@ -1,0 +1,48 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h" />
+
+  <Extern href="vsshlids.h" />
+
+  <Commands package="guidGoToCommandsPackage">
+    <Groups>
+      <Group guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToHeaderCode" priority="0x0100" type="Button">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Go To Header / Code File</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToTest" priority="0x0100" type="Button">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>TextChanges</CommandFlag>
+        <Strings>
+          <ButtonText>Go To Test / Class</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+
+  </Commands>
+
+  <Symbols>
+    <GuidSymbol name="guidGoToCommandsPackage" value="{aeae4f09-dcb3-4a6d-950c-668bbef87f2b}" />
+    <GuidSymbol name="guidUIContext" value="{6B4C995A-47FD-4461-90A2-2048B531EBE1}" />
+
+    <GuidSymbol name="guidGoToCommandsPackageCmdSet" value="{18a02811-3efc-4164-ba29-3bf12ab847ad}">
+      <IDSymbol name="GoToCommands" value="0x1020" />
+      <IDSymbol name="GoToCommandsId" value="0x0100" />
+      <IDSymbol value="4129" name="cmdidGoToHeaderCode" />
+      <IDSymbol value="4131" name="cmdidGoToTest" />
+    </GuidSymbol>
+  
+  </Symbols>
+</CommandTable>
