@@ -33,7 +33,7 @@ namespace GoToCommands
 		termNames: new[] { "header", "code" },
 		termValues: new[] { "HierSingleSelectionName:.h$", "HierSingleSelectionName:.cpp$" })]
 	[ProvideAutoLoad(UiConstraintGuidString, PackageAutoLoadFlags.BackgroundLoad)]
-	public sealed class GoToCommandsPackage : Package
+	public sealed class GoToCommandsPackage : AsyncPackage
 	{
 		public const string PackageGuidString = "aeae4f09-dcb3-4a6d-950c-668bbef87f2b";
 		public const string UiConstraintGuidString = "6B4C995A-47FD-4461-90A2-2048B531EBE1";
@@ -44,12 +44,12 @@ namespace GoToCommands
 
 		#region Package Members
 
-		protected override void Initialize()
+		protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
 		{
-			ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-			base.Initialize();
+			await JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
 			GoToHeaderCode.Initialize(this);
-		    GoToTestClass.Initialize(this);
+			GoToTestClass.Initialize(this);
 		}
 
 		#endregion
