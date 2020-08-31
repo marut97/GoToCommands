@@ -72,7 +72,7 @@ namespace GoToCommands.Commands
 		private void Execute(object sender, EventArgs e)
 		{
 			ThreadHelper.ThrowIfNotOnUIThread();
-			string path = _testFolder ? Utilities.FindTest(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name) : Utilities.FindTest(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name);
+			string path = _testFolder ? Utilities.FindClass(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name) : Utilities.FindTest(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name);
 			if (!string.IsNullOrEmpty(path))
 				_dte.ExecuteCommand("File.OpenFile", path);
 		}

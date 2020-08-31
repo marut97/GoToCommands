@@ -13,8 +13,9 @@ namespace GoToCommands.Lib
 		private static readonly string codeExtension = ".cpp";
 		private static readonly string headerFolder = "include";
 		private static readonly string codeFolder = "src";
+		private static readonly string testFolder = "test";
 		private static readonly string headerCodeRelativePath = "\\..\\";
-		private static readonly string headerTestRelativePath = "include\\..\\..\\test";
+		private static readonly string headerTestRelativePath = "\\..\\..\\";
 
 		public static string FindHeader(string codePath, string codeFileName)
 		{
@@ -56,10 +57,16 @@ namespace GoToCommands.Lib
 
 		public static string FindTest(string filePath, string fileName)
 		{
+			if (fileName.Contains(".cpp"))
+				filePath = filePath.Substring(0, filePath.LastIndexOf(codeFolder)) + headerFolder;
+
+			var testPath = filePath.Substring(0, filePath.LastIndexOf(headerFolder)) + headerFolder + headerTestRelativePath + testFolder;
+
+			if (!Directory.Exists(testPath))
+				return null;
+
 			var extensionIndex = fileName.LastIndexOf(".");
 			fileName = fileName.Remove(extensionIndex);
-
-			var testPath = filePath.Substring(0, filePath.LastIndexOf(headerFolder)) + headerTestRelativePath;
 
 			var files = Directory.GetFiles(testPath, "*"+fileName+"*", SearchOption.AllDirectories).ToList().OrderBy( e => (e.Length - e.LastIndexOf("\\")));
 
@@ -67,6 +74,54 @@ namespace GoToCommands.Lib
 				return files.First();
 
 			return null;
+		}
+
+		public static string FindClass(string filePath, string fileName)
+		{
+			filePath = filePath.Remove(filePath.LastIndexOf(testFolder + "\\"));
+			var extensionIndex = fileName.LastIndexOf(".");
+			fileName = fileName.Remove(extensionIndex);
+
+
+			string headerFolderPath = null;
+
+			foreach (var folder in Directory.GetDirectories(filePath).ToList())
+			{
+				List<string> paths = Directory.GetDirectories(folder, headerFolder).ToList();
+				if (paths.Count() > 0)
+				{
+					headerFolderPath = paths.First();
+					break;
+				}
+			}
+
+			if (headerFolderPath == null)
+				return null;
+
+			var files = getAllHeaderFiles(headerFolderPath);
+
+			int currentFileSize = 100;
+			string matchedFile = null;
+			foreach (var file in files)
+			{
+				var headerFileName = file.Substring(file.LastIndexOf("\\") + 1);
+				headerFileName = headerFileName.Substring(0, headerFileName.LastIndexOf("."));
+				if (fileName.Contains(headerFileName) && headerFileName.Count() < currentFileSize)
+				{
+					currentFileSize = headerFileName.Count();
+					matchedFile = file;
+				}
+			}
+
+			return matchedFile;
+		}
+
+		private static List<string> getAllHeaderFiles(string headerFolderPath)
+		{
+			var files = Directory.GetFiles(headerFolderPath, "*.h", SearchOption.AllDirectories).ToList();
+			files.AddRange(Directory.GetFiles(headerFolderPath + headerCodeRelativePath + codeFolder, "*.h", SearchOption.AllDirectories).ToList());
+
+			return files;
 		}
 
 		private static string FindHeaderCodeFilePath(string basePath, string fileName, string currentFolder)
