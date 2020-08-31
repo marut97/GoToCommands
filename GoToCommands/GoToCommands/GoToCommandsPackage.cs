@@ -32,7 +32,7 @@ namespace GoToCommands
 		expression: "header | code", // This will make the button only show for .cpp and .h files
 		termNames: new[] { "header", "code" },
 		termValues: new[] { "HierSingleSelectionName:.h$", "HierSingleSelectionName:.cpp$" })]
-	[ProvideAutoLoad(UiConstraintGuidString)]
+	[ProvideAutoLoad(UiConstraintGuidString, PackageAutoLoadFlags.BackgroundLoad)]
 	public sealed class GoToCommandsPackage : Package
 	{
 		public const string PackageGuidString = "aeae4f09-dcb3-4a6d-950c-668bbef87f2b";
