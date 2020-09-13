@@ -28,13 +28,13 @@
           <ButtonText>Go To Test/Class</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToImplementation" priority="0x0100" type="Button">
+      <!--<Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToImplementation" priority="0x0100" type="Button">
         <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <Strings>
           <ButtonText>Go To Implementation</ButtonText>
         </Strings>
-      </Button>
+      </Button>-->
     </Buttons>
   </Commands>
 
@@ -47,7 +47,7 @@
       <IDSymbol name="GoToCommandsId" value="0x0100" />
       <IDSymbol value="4129" name="cmdidGoToHeaderCode" />
       <IDSymbol value="4130" name="cmdidGoToTestClass" />
-      <IDSymbol value="4131" name="cmdidGoToImplementation" />
+      <!--<IDSymbol value="4131" name="cmdidGoToImplementation" />-->
     </GuidSymbol>
   
   </Symbols>
