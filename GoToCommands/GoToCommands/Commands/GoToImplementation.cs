@@ -6,100 +6,112 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Task = System.Threading.Tasks.Task;
+using EnvDTE;
+using GoToCommands.Lib;
 
 namespace GoToCommands.Commands
 {
-    /// <summary>
-    /// Command handler
-    /// </summary>
     internal sealed class GoToImplementation
     {
-        /// <summary>
-        /// Command ID.
-        /// </summary>
-        public const int CommandId = 4131;
+        public const int _commandId = 4131;
 
-        /// <summary>
-        /// Command menu group (command set GUID).
-        /// </summary>
-        public static readonly Guid CommandSet = new Guid("aae9e0ed-eadd-4224-9f0a-84251cdb9683");
+        public static readonly Guid _commandSet = new Guid("1eececa1-e0da-4689-bb36-1cfbef669757");
 
-        /// <summary>
-        /// VS Package that provides this command, not null.
-        /// </summary>
-        private readonly AsyncPackage package;
+        private readonly AsyncPackage _package;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GoToImplementation"/> class.
-        /// Adds our command handlers for menu (commands must exist in the command table file)
-        /// </summary>
-        /// <param name="package">Owner package, not null.</param>
-        /// <param name="commandService">Command service to add command to, not null.</param>
-        private GoToImplementation(AsyncPackage package, OleMenuCommandService commandService)
-        {
-            this.package = package ?? throw new ArgumentNullException(nameof(package));
-            commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+		private static DTE _dte;
 
-            var menuCommandID = new CommandID(CommandSet, CommandId);
-            var menuItem = new MenuCommand(this.Execute, menuCommandID);
-            commandService.AddCommand(menuItem);
-        }
+		private static String _interfaceName;
 
-        /// <summary>
-        /// Gets the instance of the command.
-        /// </summary>
-        public static GoToImplementation Instance
-        {
-            get;
-            private set;
-        }
+		private static readonly int _function = 128;
+		private static readonly int _pure = 2048;
+		private static readonly int _virtual = 4096;
 
-        /// <summary>
-        /// Gets the service provider from the owner package.
-        /// </summary>
-        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
-        {
-            get
-            {
-                return this.package;
-            }
-        }
+		private GoToImplementation(AsyncPackage package, OleMenuCommandService commandService)
+		{
+			_package = package ?? throw new ArgumentNullException(nameof(package));
+			commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-        /// <summary>
-        /// Initializes the singleton instance of the command.
-        /// </summary>
-        /// <param name="package">Owner package, not null.</param>
-        public static async Task InitializeAsync(AsyncPackage package)
-        {
-            // Switch to the main thread - the call to AddCommand in GoToImplementation's constructor requires
-            // the UI thread.
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
 
-            OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
-            Instance = new GoToImplementation(package, commandService);
-        }
+			var cmdId = new CommandID(_commandSet, _commandId);
+			var command = new OleMenuCommand(Execute, cmdId);
 
-        /// <summary>
-        /// This function is the callback used to execute the command when the menu item is clicked.
-        /// See the constructor to see how the menu item is associated with this function using
-        /// OleMenuCommandService service and MenuCommand class.
-        /// </summary>
-        /// <param name="sender">Event sender.</param>
-        /// <param name="e">Event args.</param>
-        private void Execute(object sender, EventArgs e)
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            string message = string.Format(CultureInfo.CurrentCulture, "Inside {0}.MenuItemCallback()", this.GetType().FullName);
-            string title = "GoToImplementation";
+			command.BeforeQueryStatus += ButtonStatus;
 
-            // Show a message box to prove we were here
-            VsShellUtilities.ShowMessageBox(
-                this.package,
-                message,
-                title,
-                OLEMSGICON.OLEMSGICON_INFO,
-                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-        }
-    }
+			commandService.AddCommand(command);
+		}
+
+		public static GoToImplementation Instance
+		{
+			get;
+			private set;
+		}
+
+		private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+		{
+			get { return _package; }
+		}
+
+		public static async Task InitializeAsync(AsyncPackage package)
+		{
+			await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+
+			OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
+			_dte = await package.GetServiceAsync(typeof(DTE)) as DTE;
+			Instance = new GoToImplementation(package, commandService);
+		}
+
+		private void ButtonStatus(object sender, EventArgs e)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			if (_dte == null || !(sender is OleMenuCommand button))
+				return;
+
+			TextSelection sel =	(TextSelection)_dte.ActiveDocument.Selection;
+			CodeClass classModel = (CodeClass)sel.ActivePoint.get_CodeElement(vsCMElement.vsCMElementClass);
+
+			if (classModel == null)
+			{
+				button.Visible = false;
+				return;
+			}
+
+			_interfaceName = classModel.Name;
+			foreach (var subElement in classModel.Children)
+			{
+				if (subElement is CodeFunction)
+				{
+					if (IsPureVirtual(subElement as CodeFunction))
+					{
+						button.Visible = true;
+						return;
+					}
+
+				}
+			}
+			button.Visible = false;
+
+		}
+
+		private static bool IsPureVirtual(CodeFunction codeFunction)
+		{
+			var functionType = (int)codeFunction.Kind;
+			return IsPowerOfTwo(functionType - _function - _virtual - _pure);
+		}
+
+		private static bool IsPowerOfTwo(int n)
+		{
+			return (int)(Math.Ceiling((Math.Log(n) / Math.Log(2)))) == (int)(Math.Floor(((Math.Log(n) / Math.Log(2)))));
+		}
+
+		private void Execute(object sender, EventArgs e)
+		{
+			ThreadHelper.ThrowIfNotOnUIThread();
+
+			var path = Utilities.FindHeaderCode(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name);
+			if (!String.IsNullOrEmpty(path))
+				_dte.ExecuteCommand("File.OpenFile", path);
+		}
+	}
 }
