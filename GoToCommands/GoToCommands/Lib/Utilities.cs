@@ -7,134 +7,85 @@ using System.Threading.Tasks;
 
 namespace GoToCommands.Lib
 {
-	public static class Utilities
-	{
-		private static readonly string headerExtension = ".h";
-		private static readonly string codeExtension = ".cpp";
-		private static readonly string headerFolder = "include";
-		private static readonly string codeFolder = "src";
-		private static readonly string testFolder = "test";
-		private static readonly string headerCodeRelativePath = "\\..\\";
-		private static readonly string headerTestRelativePath = "\\..\\..\\";
+    public static class Utilities
+    {
+        public static bool IsHeader(String fileName)
+        {
+            return fileName.EndsWith(".h");
+        }
 
-		public static string FindHeader(string codePath, string codeFileName)
+        public static bool IsCode(String fileName)
+        {
+            return fileName.EndsWith(".cpp");
+        }
+
+        public static bool IsTestProject(String projectName)
+        {
+            return projectName.ToLower().Contains("test");
+        }
+
+        public static bool IsInVSProject(string projectName)
+        {
+            return projectName != "Miscellaneous Files";
+        }
+
+		public static String FileName(string projectPath)
 		{
-			var headerPath = codePath.Replace(codeExtension, headerExtension);
-			if (File.Exists(headerPath))
-				return headerPath;
+			var lastIndex = projectPath.LastIndexOf(".");
+			var startIndex = projectPath.LastIndexOf("\\") + 1;
+			if (lastIndex > startIndex)
+				return projectPath.Substring(startIndex, lastIndex - startIndex);
+			return null;
+		}
 
-			var headerFileName = codeFileName.Replace(codeExtension, headerExtension);
+		public static String RemoveExtension(String fileName)
+		{
+			var index = fileName.LastIndexOf(".");
+			return fileName.Substring(0, index > 0 ? index : 0);
+		}
 
-			var relativePath = headerCodeRelativePath + headerFolder;
+		public static string FindHeaderCode(String filePath, String fileName)
+		{
+			bool header = filePath.EndsWith(".h");
 
-			var path = codePath.Substring(codePath.LastIndexOf(codeFolder) + codeFolder.Length, codePath.Length - 1 - (codePath.LastIndexOf(codeFolder) + codeFolder.Length));
-			headerPath = FindHeaderCodeFilePath(codePath.Substring(0, codePath.LastIndexOf(codeFolder) + codeFolder.Length) + relativePath, headerFileName, path);
+			string goToFolderName = header ? "src" : "include";
+			string currentFolderName = !header ? "src" : "include";
 
-			if (File.Exists(headerPath))
-				return headerPath;
+			string currentExtension = header ? ".h" : ".cpp";
+			string goToExtension = !header ? ".h" : ".cpp";
+
+			var path = filePath.Replace(currentExtension, goToExtension);
+
+			if (File.Exists(path))
+				return path;
+
+			fileName = fileName.Replace(currentExtension, goToExtension);
+
+			string relativePath = "\\..\\" + goToFolderName;
+
+			var currentFolderIndex = filePath.LastIndexOf(currentFolderName) + currentFolderName.Length;
+			var matchPathLength = filePath.LastIndexOf("\\") - currentFolderIndex;
+			matchPathLength = matchPathLength > 0 ? matchPathLength : 0;
+			var matchPath = filePath.Substring(currentFolderIndex, matchPathLength);
+			path = FindFile(fileName, filePath.Substring(0, currentFolderIndex) + relativePath, matchPath);
+
+			if (File.Exists(path))
+				return path;
 
 			return null;
 		}
 
-		public static string FindCode(string headerPath, string headerFileName)
+		private static String FindFile(String fileName, String findFolder, String matchPath)
 		{
-			var codePath = headerPath.Replace(headerExtension, codeExtension);
-			if (File.Exists(codePath))
-				return codePath;
-
-			var codeFileName = headerFileName.Replace(headerExtension, codeExtension);
-
-			var relativePath = headerCodeRelativePath + codeFolder;
-
-			var path = headerPath.Substring(headerPath.LastIndexOf(headerFolder) + headerFolder.Length, headerPath.Length - 1 - (headerPath.LastIndexOf(headerFolder) + headerFolder.Length));
-			codePath = FindHeaderCodeFilePath(headerPath.Substring(0, headerPath.LastIndexOf(headerFolder) + headerFolder.Length) + relativePath, codeFileName, path);
-
-			if (File.Exists(codePath))
-				return codePath;
-
-			return null;
-		}
-
-		public static string FindTest(string filePath, string fileName)
-		{
-			if (fileName.Contains(".cpp"))
-				filePath = filePath.Substring(0, filePath.LastIndexOf(codeFolder)) + headerFolder;
-
-			var testPath = filePath.Substring(0, filePath.LastIndexOf(headerFolder)) + headerFolder + headerTestRelativePath + testFolder;
-
-			if (!Directory.Exists(testPath))
+			if (!Directory.Exists(findFolder))
 				return null;
 
-			var extensionIndex = fileName.LastIndexOf(".");
-			fileName = fileName.Remove(extensionIndex);
+			var files = Directory.GetFiles(findFolder, fileName, SearchOption.AllDirectories).ToList();
 
-			var files = Directory.GetFiles(testPath, "*"+fileName+"*", SearchOption.AllDirectories).ToList().OrderBy( e => (e.Length - e.LastIndexOf("\\")));
-
-			if (files.Count() > 0)
-				return files.First();
-
-			return null;
+			return HandleDuplicates(files, matchPath);
 		}
 
-		public static string FindClass(string filePath, string fileName)
-		{
-			filePath = filePath.Remove(filePath.LastIndexOf(testFolder + "\\"));
-			var extensionIndex = fileName.LastIndexOf(".");
-			fileName = fileName.Remove(extensionIndex);
-
-
-			string headerFolderPath = null;
-
-			foreach (var folder in Directory.GetDirectories(filePath).ToList())
-			{
-				List<string> paths = Directory.GetDirectories(folder, headerFolder).ToList();
-				if (paths.Count() > 0)
-				{
-					headerFolderPath = paths.First();
-					break;
-				}
-			}
-
-			if (headerFolderPath == null)
-				return null;
-
-			var files = getAllHeaderFiles(headerFolderPath);
-
-			int currentFileSize = 100;
-			string matchedFile = null;
-			foreach (var file in files)
-			{
-				var headerFileName = file.Substring(file.LastIndexOf("\\") + 1);
-				headerFileName = headerFileName.Substring(0, headerFileName.LastIndexOf("."));
-				if (fileName.Contains(headerFileName) && headerFileName.Count() < currentFileSize)
-				{
-					currentFileSize = headerFileName.Count();
-					matchedFile = file;
-				}
-			}
-
-			return matchedFile;
-		}
-
-		private static List<string> getAllHeaderFiles(string headerFolderPath)
-		{
-			var files = Directory.GetFiles(headerFolderPath, "*.h", SearchOption.AllDirectories).ToList();
-			files.AddRange(Directory.GetFiles(headerFolderPath + headerCodeRelativePath + codeFolder, "*.h", SearchOption.AllDirectories).ToList());
-
-			return files;
-		}
-
-		private static string FindHeaderCodeFilePath(string basePath, string fileName, string currentFolder)
-		{
-			if (!Directory.Exists(basePath))
-				return null;
-
-			var files = Directory.GetFiles(basePath, fileName, SearchOption.AllDirectories).ToList();
-
-			return HandleDuplicates(files, currentFolder);
-		}
-
-		private static string HandleDuplicates(List<string> files, string currentFolder)
+		private static String HandleDuplicates(List<String> files, String matchPath)
 		{
 			if (files.Count > 1)
 			{
@@ -144,7 +95,7 @@ namespace GoToCommands.Lib
 					similarityIndex.Add(0);
 				}
 
-				List<string> folders = currentFolder.Split('\\').ToList();
+				List<String> folders = matchPath.Split('\\').ToList();
 				foreach (var folderName in folders)
 				{
 					for (int i = 0; i < files.Count; i++)
@@ -153,7 +104,6 @@ namespace GoToCommands.Lib
 							similarityIndex[i]++;
 					}
 				}
-
 
 				return BestMatch(similarityIndex, files);
 			}
@@ -164,7 +114,7 @@ namespace GoToCommands.Lib
 			return null;
 		}
 
-		private static string BestMatch(List<int> similarityIndex, List<string> files)
+		private static String BestMatch(List<int> similarityIndex, List<String> files)
 		{
 			var maxValue = similarityIndex.Max();
 			var index = similarityIndex.IndexOf(maxValue);
@@ -180,5 +130,38 @@ namespace GoToCommands.Lib
 			}
 			return file;
 		}
+
+		public static String BestTest(List<string> allFiles, string classFile)
+		{
+			int fileNameSize = int.MaxValue;
+			String testFile = null;
+			foreach (var file in allFiles)
+			{
+				var testFileName = FileName(file);
+				if (testFileName.Contains(classFile) && testFileName.Length < fileNameSize)
+				{
+					fileNameSize = testFileName.Length;
+					testFile = file;
+				}
+			}
+			return testFile;
+		}
+
+		public static String BestClass(List<string> allFiles, string testFileName)
+		{
+			int fileNameSize = 0;
+			String testFile = null;
+			foreach (var file in allFiles)
+			{
+				var classFileName = FileName(file);
+				if (testFileName.Contains(classFileName) && classFileName.Length > fileNameSize)
+				{
+					fileNameSize = classFileName.Length;
+					testFile = file;
+				}
+			}
+			return testFile;
+		}
+
 	}
 }

@@ -1,80 +1,188 @@
-﻿//------------------------------------------------------------------------------
-// <copyright file="GoToTest.cs" company="Company">
-//     Copyright (c) Company.  All rights reserved.
-// </copyright>
-//------------------------------------------------------------------------------
-
-using System;
+﻿using System;
 using System.ComponentModel.Design;
 using System.Globalization;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
+using System.Threading;
+using System.Threading.Tasks;
 using EnvDTE;
 using GoToCommands.Lib;
+using Microsoft.VisualStudio.Shell;
+using System.Linq;
+using Microsoft.VisualStudio.Shell.Interop;
+using Task = System.Threading.Tasks.Task;
+using System.Collections.Generic;
+using System.IO;
 
 namespace GoToCommands.Commands
 {
-	internal sealed class GoToTestClass
-	{
-		public const int CommandId = 4131;
+    internal sealed class GoToTestClass
+    {
+        public const int _commandId = 4130;
 
-		public static readonly Guid CommandSet = new Guid("18a02811-3efc-4164-ba29-3bf12ab847ad");
+        public static readonly Guid _commandSet = new Guid("1eececa1-e0da-4689-bb36-1cfbef669757");
 
-		private readonly Package _package;
+        private readonly AsyncPackage _package;
 
-		private static DTE _dte;
+        private static DTE _dte;
 
-		private static bool _testFolder;
+		private static List<String> _codeProjects;
 
-		private GoToTestClass(Package package)
-		{
-			_package = package ?? throw new ArgumentNullException(nameof(package));
-			OleMenuCommandService commandService = ServiceProvider.GetService(typeof(IMenuCommandService)) as OleMenuCommandService;
-			commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+		private static List<String> _testProjects;
 
-			_dte = ServiceProvider.GetService(typeof(DTE)) as DTE;
+        private GoToTestClass(AsyncPackage package, OleMenuCommandService commandService)
+        {
+            _package = package ?? throw new ArgumentNullException(nameof(package));
+            commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
 
-			var cmdID = new CommandID(CommandSet, CommandId);
-			var command = new OleMenuCommand(Execute, cmdID);
+            var cmdId = new CommandID(_commandSet, _commandId);
+            var command = new OleMenuCommand(Execute, cmdId);
 
-			command.BeforeQueryStatus += MyQueryStatus;
+			InitializeProjectsList();
 
-			commandService.AddCommand(command);
-		}
+            command.BeforeQueryStatus += ButtonStatus;
+
+            commandService.AddCommand(command);
+        }
 
 		public static GoToTestClass Instance
-		{
-			get;
-			private set;
-		}
+        {
+            get;
+            private set;
+        }
 
-		private IServiceProvider ServiceProvider
-		{
-			get { return _package; }
-		}
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider
+        {
+            get { return _package; }
+        }
 
-		public static void Initialize(Package package)
-		{
+        public static async Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+
+            OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
+            _dte = await package.GetServiceAsync(typeof(DTE)) as DTE;
+            Instance = new GoToTestClass(package, commandService);
+        }
+
+        private void ButtonStatus(object sender, EventArgs e)
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+
+            if (_dte == null || !(sender is OleMenuCommand button))
+                return;
+
+            var filePath = _dte.ActiveDocument.FullName;
+			if (_dte.ActiveDocument.ProjectItem == null)
+			{
+				button.Visible = false;
+				return;
+			}
+            var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
+            button.Visible = Utilities.IsHeader(filePath) || Utilities.IsCode(filePath);
+            button.Text = Utilities.IsTestProject(projectName) ? "Go To Class" : "Go To Test";
+        }
+
+        private void Execute(object sender, EventArgs e)
+        {
 			ThreadHelper.ThrowIfNotOnUIThread();
-
-			Instance = new GoToTestClass(package);
-		}
-
-		private void MyQueryStatus(object sender, EventArgs e)
-		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-
-			var button = sender as OleMenuCommand;
-			_testFolder = _dte.ActiveDocument.FullName.Contains("\\test\\");
-			button.Text =  _testFolder ? "Go To Class" : "Go To Test";
-		}
-
-		private void Execute(object sender, EventArgs e)
-		{
-			ThreadHelper.ThrowIfNotOnUIThread();
-			string path = _testFolder ? Utilities.FindClass(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name) : Utilities.FindTest(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name);
-			if (!string.IsNullOrEmpty(path))
+			var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
+			bool test = Utilities.IsTestProject(projectName);
+			var path = GetFile(projectName, test, _dte.ActiveDocument.Name);
+			if (!string.IsNullOrEmpty(path) && File.Exists(path))
 				_dte.ExecuteCommand("File.OpenFile", path);
 		}
+
+
+		private void InitializeProjectsList()
+		{
+			//TODO: Needs to be changed to recursive method to get all projects in the future
+			var solution = _dte.Solution;
+			var projects = Directory.GetFiles(_dte.Solution.FullName.Substring(0, _dte.Solution.FullName.LastIndexOf("\\")), "*.vcxproj", SearchOption.AllDirectories).ToList();
+
+			_codeProjects = new List<String>();
+			_testProjects = new List<String>();
+
+			//TODO: Need to add recursive method to find all project files in project
+			foreach (var project in projects)
+			{
+				if (project.Substring(project.LastIndexOf("\\")).ToLower().Contains("test"))
+					_testProjects.Add(project);
+				else
+					_codeProjects.Add(project);
+			}
+		}
+
+		private static String GetFile(String projectName, bool test, String fileName)
+		{
+			return test ? FindClass(projectName, fileName) : FindTest(projectName, fileName);
+		}
+
+		private static string FindClass(string projectName, string fileName)
+		{
+			var testFileName = Utilities.RemoveExtension(fileName);
+			List<String> projects = CodeProjects(projectName);
+			List<String> allFiles = new List<String>();
+
+			foreach (var project in projects)
+			{
+				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
+				allFiles.AddRange(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories).ToList());
+			}
+			return Utilities.BestClass(allFiles, testFileName);
+		}
+
+		private static List<String> CodeProjects(string testProjectName)
+		{
+			String matchingProject = null;
+			int projectNameSize = 0;
+			foreach (var project in _codeProjects)
+			{
+				var projectName = Utilities.FileName(project);
+				if (testProjectName.Contains(projectName) && projectName.Length > projectNameSize)
+				{
+					matchingProject = project;
+					projectNameSize = projectName.Length;
+				}
+			}
+
+			if (matchingProject == null)
+				return _codeProjects;
+
+			return new List<String> { matchingProject };
+		}
+
+		private static string FindTest(string projectName, string fileName)
+		{
+			var classFileName = Utilities.RemoveExtension(fileName);
+			List<String> projects = TestProjects(projectName);
+			List<String> allFiles = new List<String>();
+
+			foreach (var project in projects)
+			{
+				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
+				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*", SearchOption.AllDirectories).ToList());
+			}
+			return Utilities.BestTest(allFiles, classFileName);
+		}
+
+		private static List<String> TestProjects(String codeProjectName)
+		{
+			String matchingProject = null;
+			int projectNameSize = int.MaxValue;
+			foreach (String project in _testProjects)
+			{
+				var projectName = Utilities.FileName(project);
+				if (projectName.Contains(codeProjectName) && projectName.Length < projectNameSize)
+				{
+					matchingProject = project;
+					projectNameSize = projectName.Length;
+				}
+			}
+
+			if (matchingProject == null)
+				return _testProjects;
+
+			return new List<String>{ matchingProject };
+		}
+
 	}
 }

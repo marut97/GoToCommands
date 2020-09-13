@@ -2,7 +2,6 @@
 <CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
   <Extern href="stdidcmd.h" />
-
   <Extern href="vsshlids.h" />
 
   <Commands package="guidGoToCommandsPackage">
@@ -18,31 +17,39 @@
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Go To Header / Code File</ButtonText>
+          <ButtonText>Go To Header/Code File</ButtonText>
         </Strings>
       </Button>
-      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToTest" priority="0x0100" type="Button">
+      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToTestClass" priority="0x0100" type="Button">
         <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Go To Test / Class</ButtonText>
+          <ButtonText>Go To Test/Class</ButtonText>
+        </Strings>
+      </Button>
+      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToImplementation" priority="0x0100" type="Button">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <Strings>
+          <ButtonText>Go To Implementation</ButtonText>
         </Strings>
       </Button>
     </Buttons>
-
   </Commands>
 
   <Symbols>
-    <GuidSymbol name="guidGoToCommandsPackage" value="{aeae4f09-dcb3-4a6d-950c-668bbef87f2b}" />
+    <GuidSymbol name="guidGoToCommandsPackage" value="{20bc4cc8-d316-4f4a-9f46-ec8f3fe76d4d}" />
     <GuidSymbol name="guidUIContext" value="{6B4C995A-47FD-4461-90A2-2048B531EBE1}" />
 
-    <GuidSymbol name="guidGoToCommandsPackageCmdSet" value="{18a02811-3efc-4164-ba29-3bf12ab847ad}">
+    <GuidSymbol name="guidGoToCommandsPackageCmdSet" value="{1eececa1-e0da-4689-bb36-1cfbef669757}">
       <IDSymbol name="GoToCommands" value="0x1020" />
       <IDSymbol name="GoToCommandsId" value="0x0100" />
       <IDSymbol value="4129" name="cmdidGoToHeaderCode" />
-      <IDSymbol value="4131" name="cmdidGoToTest" />
+      <IDSymbol value="4130" name="cmdidGoToTestClass" />
+      <IDSymbol value="4131" name="cmdidGoToImplementation" />
     </GuidSymbol>
   
   </Symbols>
+
 </CommandTable>
