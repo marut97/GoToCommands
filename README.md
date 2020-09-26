@@ -4,10 +4,8 @@
 This extension is meant to ease the navigation of large C++ repositories by providing navigation commands in the context menu of the code editor. As an additional feature, it is also capable of navigating through the code of installed packages and references. This would be helpful in scenarios where the source code of the numerous nuget packages and dlls are also downloaded and stored on the local machine. Additionally, the path to these locations need not be configured in the project settings.
 
 ## Current Features:
-1. Go to code file from header file
-2. Go to header file from code file
-3. Go to class test file from header file or code file
-4. Go to class header file from class test file
+1. Go To Header / Code - To toggle between header and code files in and outside the VS project
+2. Go To Test / Class - To toggle between the test and the code class for any VS project item
 
 ## Upcoming Features
 1. Configuration settings to provide paths. Both absolute and relative paths.
@@ -24,3 +22,11 @@ Feature requests always welcome :)
 3. Header and Code file must have the same file name. Case insensitive.
 4. Class test must contain the name of the file in which the class is present. (Will be extended in the future to contain the name of the class rather than the name of the file in which the class is present)
 5. Currently supports only single class in a file
+6. Might not work for solutions with deeply nested subprojects and solution folders
+
+## Version Details:
+1.5.1 - Fixing extension load time issues. 
+        Fixing Go To Test bug where non header or cpp files could be opened
+        Fixing Go To Test bug where Go To Test was available for non VS project items
+1.5 - Go To Test/Class
+1.4 - Go to Header/Code
