@@ -24,7 +24,7 @@ namespace GoToCommands
     [Guid(GoToCommandsPackage.PackageGuidString)]
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "pkgdef, VS and vsixmanifest are valid VS terms")]
     [ProvideService(typeof(IMenuCommandService), IsAsyncQueryable = true)]
-    [ProvideAutoLoad(UiConstraintGuidString, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(VSConstants.UICONTEXT.SolutionExists_string, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideUIContextRule(UiConstraintGuidString, // Must match the GUID in the .vsct file
         name: "UI Context",
         expression: "header | code", // This will make the button only show for .cpp and .h files

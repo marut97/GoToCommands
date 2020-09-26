@@ -77,6 +77,11 @@ namespace GoToCommands.Commands
 				return;
 			}
             var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
+			if (!Utilities.IsInVSProject(projectName))
+			{
+				button.Visible = false;
+				return;
+			}
             button.Visible = Utilities.IsHeader(filePath) || Utilities.IsCode(filePath);
             button.Text = Utilities.IsTestProject(projectName) ? "Go To Class" : "Go To Test";
         }
@@ -159,9 +164,15 @@ namespace GoToCommands.Commands
 			foreach (var project in projects)
 			{
 				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
-				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*", SearchOption.AllDirectories).ToList());
+				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*.cpp", SearchOption.AllDirectories).ToList());
 			}
-			return Utilities.BestTest(allFiles, classFileName);
+			var validFiles = new List<String>();
+			foreach (var file in allFiles)
+			{
+				if (file.EndsWith(".h") || file.EndsWith(".cpp"))
+					validFiles.Add(file);
+			}
+			return Utilities.BestTest(validFiles, classFileName);
 		}
 
 		private static List<String> TestProjects(String codeProjectName)
