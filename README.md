@@ -25,8 +25,8 @@ Feature requests always welcome :)
 6. Might not work for solutions with deeply nested subprojects and solution folders
 
 ## Version Details:
-1.5.1 - Fixing extension load time issues. 
-        Fixing Go To Test bug where non header or cpp files could be opened        
-        Fixing Go To Test bug where Go To Test was available for non VS project items
-1.5 - Go To Test/Class
-1.4 - Go to Header/Code
+1.5.1 - Fixing extension load time issues.  
+        Fixing Go To Test bug where non header or cpp files could be opened.          
+        Fixing Go To Test bug where Go To Test was available for non VS project items.  
+1.5 - Go To Test/Class  
+1.4 - Go to Header/Code  
