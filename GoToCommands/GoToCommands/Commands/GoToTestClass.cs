@@ -164,12 +164,12 @@ namespace GoToCommands.Commands
 			foreach (var project in projects)
 			{
 				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
-				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*.cpp", SearchOption.AllDirectories).ToList());
+				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*", SearchOption.AllDirectories).ToList());
 			}
 			var validFiles = new List<String>();
 			foreach (var file in allFiles)
 			{
-				if (file.EndsWith(".h") || file.EndsWith(".cpp"))
+				if (Utilities.IsHeader(file) || Utilities.IsCode(file))
 					validFiles.Add(file);
 			}
 			return Utilities.BestTest(validFiles, classFileName);
