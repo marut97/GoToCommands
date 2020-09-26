@@ -19,8 +19,8 @@ This extension is meant to ease the navigation of large C++ repositories by prov
 Feature requests always welcome :)
 
 ## Current Limitations:
-1. Relative path between the include and source directory is hardcoded. It will work only if the relative path is "include/../src"
-2. Relative path between the test folder and the header folder is harcoded. It will work only if the relative path is "include/../../test"
+1. If the header file is not in a visual studio project, Relative path between the include and source directory is hardcoded. It will work only if the relative path is "include/../src"
+2. Go To test will work only if the test projects have the keyword "test" in their name(case insensitive). All files in the test project are considered as test files.
 3. Header and Code file must have the same file name. Case insensitive.
 4. Class test must contain the name of the file in which the class is present. (Will be extended in the future to contain the name of the class rather than the name of the file in which the class is present)
 5. Currently supports only single class in a file
