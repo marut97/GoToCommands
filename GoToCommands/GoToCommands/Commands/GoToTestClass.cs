@@ -36,7 +36,10 @@ namespace GoToCommands.Commands
             var cmdId = new CommandID(_commandSet, _commandId);
             var command = new OleMenuCommand(Execute, cmdId);
 
-			InitializeProjectsList();
+			if(_dte != null)
+				DteUtilities.FillProjects(_dte);
+
+			//InitializeProjectsList();
 
             command.BeforeQueryStatus += ButtonStatus;
 
@@ -91,6 +94,7 @@ namespace GoToCommands.Commands
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
 			bool test = Utilities.IsTestProject(projectName);
+			var files = DteUtilities.Files(DteUtilities._testProjects[0]);
 			var path = GetFile(projectName, test, _dte.ActiveDocument.Name);
 			if (!string.IsNullOrEmpty(path) && File.Exists(path))
 				_dte.ExecuteCommand("File.OpenFile", path);

@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="NewFilter1">
+      <UniqueIdentifier>{3144b1a9-e951-4794-9a2d-e4a9fc610f40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -46,6 +49,9 @@
     </ClCompile>
     <ClCompile Include="test\trialuitest.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="filterItem.cpp">
+      <Filter>NewFilter1</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
