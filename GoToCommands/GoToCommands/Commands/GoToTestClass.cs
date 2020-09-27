@@ -94,7 +94,6 @@ namespace GoToCommands.Commands
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
 			bool test = Utilities.IsTestProject(projectName);
-			var files = DteUtilities.Files(DteUtilities._testProjects[0]);
 			var path = GetFile(projectName, test, _dte.ActiveDocument.Name);
 			if (!string.IsNullOrEmpty(path) && File.Exists(path))
 				_dte.ExecuteCommand("File.OpenFile", path);
@@ -128,76 +127,33 @@ namespace GoToCommands.Commands
 		private static string FindClass(string projectName, string fileName)
 		{
 			var testFileName = Utilities.RemoveExtension(fileName);
-			List<String> projects = CodeProjects(projectName);
+			List<Project> projects = DteUtilities.CodeProjects(projectName);
 			List<String> allFiles = new List<String>();
 
 			foreach (var project in projects)
 			{
-				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
-				allFiles.AddRange(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories).ToList());
+				allFiles.AddRange(DteUtilities.Files(project, false));
 			}
 			return Utilities.BestClass(allFiles, testFileName);
 		}
 
-		private static List<String> CodeProjects(string testProjectName)
-		{
-			String matchingProject = null;
-			int projectNameSize = 0;
-			foreach (var project in _codeProjects)
-			{
-				var projectName = Utilities.FileName(project);
-				if (testProjectName.Contains(projectName) && projectName.Length > projectNameSize)
-				{
-					matchingProject = project;
-					projectNameSize = projectName.Length;
-				}
-			}
 
-			if (matchingProject == null)
-				return _codeProjects;
-
-			return new List<String> { matchingProject };
-		}
 
 		private static string FindTest(string projectName, string fileName)
 		{
 			var classFileName = Utilities.RemoveExtension(fileName);
-			List<String> projects = TestProjects(projectName);
+			List<Project> projects = DteUtilities.TestProjects(projectName);
 			List<String> allFiles = new List<String>();
 
 			foreach (var project in projects)
 			{
-				String projectPath = project.Substring(0, project.LastIndexOf("\\"));
-				 allFiles.AddRange(Directory.GetFiles(projectPath, "*" + classFileName + "*", SearchOption.AllDirectories).ToList());
+				allFiles.AddRange(DteUtilities.Files(project));
 			}
-			var validFiles = new List<String>();
-			foreach (var file in allFiles)
-			{
-				if (Utilities.IsHeader(file) || Utilities.IsCode(file))
-					validFiles.Add(file);
-			}
-			return Utilities.BestTest(validFiles, classFileName);
+
+			return Utilities.BestTest(allFiles, classFileName);
 		}
 
-		private static List<String> TestProjects(String codeProjectName)
-		{
-			String matchingProject = null;
-			int projectNameSize = int.MaxValue;
-			foreach (String project in _testProjects)
-			{
-				var projectName = Utilities.FileName(project);
-				if (projectName.Contains(codeProjectName) && projectName.Length < projectNameSize)
-				{
-					matchingProject = project;
-					projectNameSize = projectName.Length;
-				}
-			}
 
-			if (matchingProject == null)
-				return _testProjects;
-
-			return new List<String>{ matchingProject };
-		}
 
 	}
 }

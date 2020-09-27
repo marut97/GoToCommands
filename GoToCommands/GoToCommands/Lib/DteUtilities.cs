@@ -77,7 +77,7 @@ namespace GoToCommands.Lib
 			}
 		}
 
-		public static List<String> Files(Project project)
+		public static List<String> Files(Project project, bool codeFiles = true)
 		{
 			var files = new List<String>();
 			foreach (ProjectItem item in project.ProjectItems)
@@ -85,11 +85,51 @@ namespace GoToCommands.Lib
 				for (short i = 0; i < item.FileCount; i++)
 				{
 					var fileName = item.FileNames[i];
-					if (Utilities.IsCode(fileName) || Utilities.IsHeader(fileName))
+					if ((codeFiles && Utilities.IsCode(fileName)) || Utilities.IsHeader(fileName))
 						files.Add(fileName);
 				}
 			}
 			return files;
+		}
+
+		public static List<Project> TestProjects(String codeProjectName)
+		{
+			Project matchingProject = null;
+			int projectNameSize = int.MaxValue;
+			foreach (var project in DteUtilities._testProjects)
+			{
+				var projectName = project.Name;
+				if (projectName.Contains(codeProjectName) && projectName.Length < projectNameSize)
+				{
+					matchingProject = project;
+					projectNameSize = projectName.Length;
+				}
+			}
+
+			if (matchingProject == null)
+				return DteUtilities._testProjects;
+
+			return new List<Project> { matchingProject };
+		}
+
+		public static List<Project> CodeProjects(string testProjectName)
+		{
+			Project matchingProject = null;
+			int projectNameSize = 0;
+			foreach (var project in DteUtilities._codeProjects)
+			{
+				var projectName = project.Name;
+				if (testProjectName.Contains(projectName) && projectName.Length > projectNameSize)
+				{
+					matchingProject = project;
+					projectNameSize = projectName.Length;
+				}
+			}
+
+			if (matchingProject == null)
+				return DteUtilities._codeProjects;
+
+			return new List<Project> { matchingProject };
 		}
 	}
 }
