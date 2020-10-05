@@ -44,39 +44,6 @@ namespace GoToCommands.Lib
 			_projectsFilled = true;
 		}
 
-		private static void AddProject(Project project)
-		{
-			if (project.FullName.EndsWith("vcxproj"))
-			{
-				if (project.Name.ToLower().Contains("test"))
-					_testProjects.Add(project);
-				else
-					_codeProjects.Add(project);
-			}
-		}
-
-		private static void GetSolutionFolderProjects(Project solutionFolder)
-		{
-			for (var i = 1; i <= solutionFolder.ProjectItems.Count; i++)
-			{
-				var subProject = solutionFolder.ProjectItems.Item(i).SubProject;
-				if (subProject == null)
-				{
-					continue;
-				}
-
-				// If this is another solution folder, do a recursive call, otherwise add
-				if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
-				{
-					GetSolutionFolderProjects(subProject);
-				}
-				else
-				{
-					AddProject(subProject);
-				}
-			}
-		}
-
 		public static List<String> Files(Project project, bool codeFiles = true)
 		{
 			var files = new List<String>();
@@ -131,5 +98,39 @@ namespace GoToCommands.Lib
 
 			return new List<Project> { matchingProject };
 		}
+
+		private static void AddProject(Project project)
+		{
+			if (project.FullName.EndsWith("vcxproj"))
+			{
+				if (project.Name.ToLower().Contains("test"))
+					_testProjects.Add(project);
+				else
+					_codeProjects.Add(project);
+			}
+		}
+
+		private static void GetSolutionFolderProjects(Project solutionFolder)
+		{
+			for (var i = 1; i <= solutionFolder.ProjectItems.Count; i++)
+			{
+				var subProject = solutionFolder.ProjectItems.Item(i).SubProject;
+				if (subProject == null)
+				{
+					continue;
+				}
+
+				// If this is another solution folder, do a recursive call, otherwise add
+				if (subProject.Kind == ProjectKinds.vsProjectKindSolutionFolder)
+				{
+					GetSolutionFolderProjects(subProject);
+				}
+				else
+				{
+					AddProject(subProject);
+				}
+			}
+		}
+
 	}
 }

@@ -94,66 +94,15 @@ namespace GoToCommands.Commands
 			ThreadHelper.ThrowIfNotOnUIThread();
 			var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
 			bool test = Utilities.IsTestProject(projectName);
-			var path = GetFile(projectName, test, _dte.ActiveDocument.Name);
+			var projects = test ? DteUtilities.CodeProjects(projectName) : DteUtilities.TestProjects(projectName);
+			var files = new List<String>();
+			foreach (var project in projects)
+				files.AddRange(DteUtilities.Files(project));
+			var fileName = Utilities.RemoveExtension(_dte.ActiveDocument.Name);
+			var path = test ? Utilities.BestClass(files, fileName) : Utilities.BestTest(files, fileName);
 			if (!string.IsNullOrEmpty(path) && File.Exists(path))
 				_dte.ExecuteCommand("File.OpenFile", path);
 		}
-
-
-		private void InitializeProjectsList()
-		{
-			//TODO: Needs to be changed to recursive method to get all projects in the future
-			var solution = _dte.Solution;
-			var projects = Directory.GetFiles(_dte.Solution.FullName.Substring(0, _dte.Solution.FullName.LastIndexOf("\\")), "*.vcxproj", SearchOption.AllDirectories).ToList();
-
-			_codeProjects = new List<String>();
-			_testProjects = new List<String>();
-
-			//TODO: Need to add recursive method to find all project files in project
-			foreach (var project in projects)
-			{
-				if (project.Substring(project.LastIndexOf("\\")).ToLower().Contains("test"))
-					_testProjects.Add(project);
-				else
-					_codeProjects.Add(project);
-			}
-		}
-
-		private static String GetFile(String projectName, bool test, String fileName)
-		{
-			return test ? FindClass(projectName, fileName) : FindTest(projectName, fileName);
-		}
-
-		private static string FindClass(string projectName, string fileName)
-		{
-			var testFileName = Utilities.RemoveExtension(fileName);
-			List<Project> projects = DteUtilities.CodeProjects(projectName);
-			List<String> allFiles = new List<String>();
-
-			foreach (var project in projects)
-			{
-				allFiles.AddRange(DteUtilities.Files(project, false));
-			}
-			return Utilities.BestClass(allFiles, testFileName);
-		}
-
-
-
-		private static string FindTest(string projectName, string fileName)
-		{
-			var classFileName = Utilities.RemoveExtension(fileName);
-			List<Project> projects = DteUtilities.TestProjects(projectName);
-			List<String> allFiles = new List<String>();
-
-			foreach (var project in projects)
-			{
-				allFiles.AddRange(DteUtilities.Files(project));
-			}
-
-			return Utilities.BestTest(allFiles, classFileName);
-		}
-
-
 
 	}
 }
