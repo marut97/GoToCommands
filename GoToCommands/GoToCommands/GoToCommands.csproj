@@ -58,6 +58,7 @@
     <Compile Include="Commands\GoToImplementation.cs" />
     <Compile Include="Commands\GoToTestClass.cs" />
     <Compile Include="GoToCommandsPackage.cs" />
+    <Compile Include="Lib\CodeFile.cs" />
     <Compile Include="Lib\DteUtilities.cs" />
     <Compile Include="Lib\Utilities.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -162,6 +163,7 @@
   <ItemGroup>
     <VSCTCompile Include="GoToCommandsPackage.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
+      <SubType>Designer</SubType>
     </VSCTCompile>
   </ItemGroup>
   <ItemGroup>

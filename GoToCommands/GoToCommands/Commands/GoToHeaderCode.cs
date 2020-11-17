@@ -62,10 +62,11 @@ namespace GoToCommands.Commands
             if (_dte == null || !(sender is OleMenuCommand button))
                 return;
 
-            var filePath = _dte.ActiveDocument.Name;
-            var isHeader = Utilities.IsHeader(filePath);
-            button.Visible = isHeader || Utilities.IsCode(filePath);
-            button.Text = isHeader ? "Go To Code" : "Go To Header";
+            //var filePath = _dte.ActiveDocument.Name;
+            //var isHeader = Utilities.IsHeader(filePath);
+			CodeFile.set(_dte.ActiveDocument);
+            button.Visible = CodeFile.File == CodeFile.FileType.Header || CodeFile.File == CodeFile.FileType.Source;
+            button.Text = CodeFile.File == CodeFile.FileType.Source ? "Go To Source" : "Go To Header";
         }
 
         private void Execute(object sender, EventArgs e)

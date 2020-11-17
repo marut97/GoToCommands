@@ -46,8 +46,8 @@ namespace GoToCommands
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
             await GoToHeaderCode.InitializeAsync(this);
             await GoToTestClass.InitializeAsync(this);
-            //await GoToImplementation.InitializeAsync(this);
-        }
+			await GoToImplementation.InitializeAsync(this); //Comment this line
+		}
 
         #endregion
     }

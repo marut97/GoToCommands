@@ -73,20 +73,21 @@ namespace GoToCommands.Commands
             if (_dte == null || !(sender is OleMenuCommand button))
                 return;
 
-            var filePath = _dte.ActiveDocument.FullName;
-			if (_dte.ActiveDocument.ProjectItem == null)
-			{
-				button.Visible = false;
-				return;
-			}
-            var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
-			if (!Utilities.IsInVSProject(projectName))
-			{
-				button.Visible = false;
-				return;
-			}
-            button.Visible = Utilities.IsHeader(filePath) || Utilities.IsCode(filePath);
-            button.Text = Utilities.IsTestProject(projectName) ? "Go To Class" : "Go To Test";
+			//         var filePath = _dte.ActiveDocument.FullName;
+			//if (_dte.ActiveDocument.ProjectItem == null)
+			//{
+			//	button.Visible = false;
+			//	return;
+			//}
+			//         var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
+			//if (!Utilities.IsInVSProject(projectName))
+			//{
+			//	button.Visible = false;
+			//	return;
+			//}
+			CodeFile.set(_dte.ActiveDocument);
+			button.Visible = CodeFile.Project != CodeFile.ProjectType.None && CodeFile.File != CodeFile.FileType.Invalid ;
+            button.Text = CodeFile.Project == CodeFile.ProjectType.Test ? "Go To Class" : "Go To Test";
         }
 
         private void Execute(object sender, EventArgs e)
