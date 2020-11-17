@@ -78,128 +78,6 @@ namespace GoToCommands.Commands
 			CodeFile.set(_dte.ActiveDocument);
 			button.Visible = CodeFile.IsInterface;
 			_interfaceName = CodeFile.IsInterface ? CodeFile.ClassName : "";
-
-			//foreach (CodeElement element in _dte.ActiveDocument.ProjectItem.FileCodeModel.CodeElements)
-			//{
-			//	if (element.Kind == EnvDTE.vsCMElement.vsCMElementNamespace)
-			//		continue;
-
-			//	if (element.Kind != EnvDTE.vsCMElement.vsCMElementClass)
-			//		continue;
-
-			//	CodeClass classModel = (CodeClass)element;
-			//	bool isInterface = true;
-			//	foreach (var subElement in classModel.Children)
-			//	{
-			//		if (subElement is CodeFunction)
-			//		{
-			//			if (!IsPureVirtual(subElement as CodeFunction))
-			//			{
-			//				isInterface = false;
-			//				break;
-			//			}
-
-			//		}
-			//	}
-			//	if (isInterface)
-			//	{
-			//		_interfaceName = element.Name;
-			//		button.Visible = true;
-			//		return;
-			//	}
-			//}
-			//button.Visible = false;
-
-			//if (_dte.ActiveDocument.Selection is TextSelection sel)
-			//{
-			//	var count = Enum.GetValues(typeof(vsCMElement)).Length;
-			//	var element = sel.ActivePoint.get_CodeElement(vsCMElement.vsCMElementClass);
-			//	var kind = element.Kind;
-			//	var type = element.IsCodeType;
-			//	var start = element.StartPoint.Line;
-			//	var end = element.EndPoint.Line;
-			//	var line = sel.ActivePoint.Line;
-			//	//bool isCodeElement = element.Parent is CodeElement;
-			//}
-
-			//foreach (vsCMElement type in Enum.GetValues(typeof(vsCMElement)))
-			//{
-
-			//}
-
-			//if (element is CodeClass classModel)
-			//{
-			//	bool isInterface = true;
-			//	_interfaceName = classModel.Name;
-			//	foreach (var subElement in classModel.Children)
-			//	{
-			//		if (subElement is CodeFunction)
-			//		{
-			//			if (!IsPureVirtual(subElement as CodeFunction))
-			//			{
-			//				isInterface = false;
-			//				return;
-			//			}
-
-			//		}
-			//	}
-			//	button.Visible = isInterface;
-			//}
-
-			//TextSelection sel = (TextSelection);
-			//if (sel == null)
-			//	return;
-
-
-
-			//sel.ActivePoint
-
-			//Enum.GetValues()
-
-			//try
-			//{
-			//	//CodeElement element = ;
-
-			//	//if (element == null)
-			//	//	return;
-
-			//	//if (!(element is CodeClass))
-			//	//	return;
-
-			//CodeClass classModel = (CodeClass);
-			//	if (classModel == null)
-			//		return;
-
-			//	bool isInterface = true;
-			//	_interfaceName = classModel.Name;
-			//	foreach (var subElement in classModel.Children)
-			//	{
-			//		if (subElement is CodeFunction)
-			//		{
-			//			if (!IsPureVirtual(subElement as CodeFunction))
-			//			{
-			//				isInterface = false;
-			//				return;
-			//			}
-
-			//		}
-			//	}
-			//	button.Visible = isInterface;
-			//}
-			//catch (Exception)
-			//{
-			//	button.Visible = false;
-			//}
-
-			//if (String.IsNullOrEmpty(_interfaceName))
-			//{
-			//	button.Visible = false;
-			//	return;
-			//}
-
-
-			//button.Visible = false;
-
 		}
 
 		private static bool IsPureVirtual(CodeFunction codeFunction)
@@ -218,22 +96,11 @@ namespace GoToCommands.Commands
 			ThreadHelper.ThrowIfNotOnUIThread();
 
 			var codeModel = _dte.ActiveDocument.ProjectItem.ContainingProject.CodeModel;
-			//var codeElements = codeModel.CodeElements;
-			//var size = codeElements.Count;
-			//Dictionary<vsCMElement, int> count = new Dictionary<vsCMElement, int>();
-			//foreach (vsCMElement type in Enum.GetValues(typeof(vsCMElement)))
-			//{
-				
-			//	count.Add(type, 0);
-			//}
+
 			foreach (EnvDTE.CodeElement element in codeModel.CodeElements)
 			{
 				if (!Utilities.IsHeader(element.ProjectItem.Name))
 					continue;
-
-				//String name;
-				//if (element.Name.Contains("DeviceRepository"))
-				//	name = element.Name;
 
 				var codeClass = getClass(element, _interfaceName);
 				if (codeClass != null)
@@ -242,30 +109,7 @@ namespace GoToCommands.Commands
 					return;
 				}
 
-				//if (Utilities.IsHeader(element.Name))
-				//	count[element.Kind]++;
-				//else
-				//	count[element.Kind]--;
-
-				//if (element.Kind == EnvDTE.vsCMElement.vsCMElementClass)
-				//{
-				//	var myClass = (EnvDTE.CodeClass)element;
-				//	// do stuff with that class here
-				//	foreach (CodeElement baseClass in myClass.Bases)
-				//	{
-				//		if (baseClass.Name.Contains(_interfaceName))
-
-				//	}
-				//}
 			}
-			//for (int i = 1; i <= codeElements.Count; i++)
-			//{
-			//	var item = codeElements.Item(i);
-			//}
-
-			//var path = Utilities.FindHeaderCode(_dte.ActiveDocument.FullName, _dte.ActiveDocument.Name);
-			//if (!String.IsNullOrEmpty(path))
-			//	_dte.ExecuteCommand("File.OpenFile", path);
 		}
 
 		private CodeClass getClass(CodeElement codeElement, String interfaceName)
