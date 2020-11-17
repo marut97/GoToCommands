@@ -13,9 +13,9 @@ using System.Collections.Generic;
 
 namespace GoToCommands.Commands
 {
-    internal sealed class GoToImplementation
+    internal sealed class GoToDerived
     {
-        public const int _commandId = 4131;
+        public const int _commandId = 4132;
 
         public static readonly Guid _commandSet = new Guid("1eececa1-e0da-4689-bb36-1cfbef669757");
 
@@ -23,9 +23,9 @@ namespace GoToCommands.Commands
 
 		private static DTE _dte;
 
-		private static String _interfaceName;
+		private static String _baseClassName;
 
-		private GoToImplementation(AsyncPackage package, OleMenuCommandService commandService)
+		private GoToDerived(AsyncPackage package, OleMenuCommandService commandService)
 		{
 			_package = package ?? throw new ArgumentNullException(nameof(package));
 			commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
@@ -39,7 +39,7 @@ namespace GoToCommands.Commands
 			commandService.AddCommand(command);
 		}
 
-		public static GoToImplementation Instance
+		public static GoToDerived Instance
 		{
 			get;
 			private set;
@@ -56,7 +56,7 @@ namespace GoToCommands.Commands
 
 			OleMenuCommandService commandService = await package.GetServiceAsync((typeof(IMenuCommandService))) as OleMenuCommandService;
 			_dte = await package.GetServiceAsync(typeof(DTE)) as DTE;
-			Instance = new GoToImplementation(package, commandService);
+			Instance = new GoToDerived(package, commandService);
 		}
 
 		private void ButtonStatus(object sender, EventArgs e)
@@ -72,8 +72,13 @@ namespace GoToCommands.Commands
 				return;
 
 			CodeFile.set(_dte.ActiveDocument);
-			button.Visible = CodeFile.IsInterface;
-			_interfaceName = CodeFile.IsInterface ? CodeFile.ClassName : "";
+			button.Visible = CodeFile.HasDerivedClass;
+			_baseClassName = CodeFile.HasDerivedClass ? CodeFile.ClassName : "";
+		}
+
+		private static bool IsPowerOfTwo(int n)
+		{
+			return (int)(Math.Ceiling((Math.Log(n) / Math.Log(2)))) == (int)(Math.Floor(((Math.Log(n) / Math.Log(2)))));
 		}
 
 		private void Execute(object sender, EventArgs e)
@@ -87,7 +92,7 @@ namespace GoToCommands.Commands
 				if (!Utilities.IsHeader(element.ProjectItem.Name))
 					continue;
 
-				var codeClass = getClass(element, _interfaceName);
+				var codeClass = getDerivedClass(element, _baseClassName);
 				if (codeClass != null)
 				{
 					_dte.ExecuteCommand("File.OpenFile", element.ProjectItem.FileNames[0]);
@@ -97,19 +102,19 @@ namespace GoToCommands.Commands
 			}
 		}
 
-		private CodeClass getClass(CodeElement codeElement, String interfaceName)
+		private CodeClass getDerivedClass(CodeElement codeElement, String interfaceName)
 		{
 			if (codeElement is CodeClass codeClass)
 			{
 				foreach (CodeElement baseClass in codeClass.Bases)
-					if (baseClass.Name.Contains(_interfaceName))
+					if (baseClass.Name.Contains(_baseClassName))
 						return codeClass;
 			}
 			else if (codeElement is CodeNamespace)
 			{
 				foreach (CodeElement element in codeElement.Children)
 				{
-					var classModel = getClass(element, interfaceName);
+					var classModel = getDerivedClass(element, interfaceName);
 					if (classModel != null)
 						return classModel;
 				}

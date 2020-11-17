@@ -40,7 +40,15 @@
         </Strings>
       </Button>
       <!--End here-->
-    </Buttons>
+      <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToDerived" priority="0x0100" type="Button">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <CommandFlag>DynamicVisibility</CommandFlag>
+        <CommandFlag>DefaultInvisible</CommandFlag>
+        <Strings>
+          <ButtonText>Go To Derived</ButtonText>
+        </Strings>
+      </Button>
+	</Buttons>
   </Commands>
 
   <Symbols>
@@ -52,10 +60,9 @@
       <IDSymbol name="GoToCommandsId" value="0x0100" />
       <IDSymbol value="4129" name="cmdidGoToHeaderCode" />
       <IDSymbol value="4130" name="cmdidGoToTestClass" />
-      <!--Add comment here-->
       <IDSymbol value="4131" name="cmdidGoToImplementation" />
+      <IDSymbol value="4132" name="cmdidGoToDerived" />
     </GuidSymbol>
-  
   </Symbols>
 
 </CommandTable>

@@ -76,18 +76,24 @@ namespace GoToCommands.Lib
 			}
 		}
 
-		private static bool isPowerOfTwo(int n)
+		private static bool isPowerOfTwo(Int32 n)
 		{
-			return (int)(Math.Ceiling((Math.Log(n) / Math.Log(2)))) == (int)(Math.Floor(((Math.Log(n) / Math.Log(2)))));
+			if (n < 0)
+				return false;
+
+			return (Math.Ceiling((Math.Log(n) / Math.Log(2)))) == (Math.Floor(((Math.Log(n) / Math.Log(2)))));
 		}
 
 		private static FunctionType functionType(CodeFunction codeFunction)
 		{
-			var functionType = (int)codeFunction.Kind;
-			if (isPowerOfTwo(functionType - _function - _virtual - _pure))
+			var functionType = codeFunction.FunctionKind;
+
+			if (isPowerOfTwo((Int32)functionType - (Int32)vsCMFunction.vsCMFunctionFunction - (Int32)vsCMFunction.vsCMFunctionVirtual - (Int32)vsCMFunction.vsCMFunctionPure) )
 				return FunctionType.PureVirtual;
-			if (isPowerOfTwo(functionType - _function - _virtual))
+
+			if (isPowerOfTwo((Int32)functionType - (Int32)vsCMFunction.vsCMFunctionFunction - (Int32)vsCMFunction.vsCMFunctionVirtual) || (Int32)functionType == _overridenMethod)
 				return FunctionType.Virtual;
+
 			return FunctionType.Other;
 		}
 
@@ -95,6 +101,8 @@ namespace GoToCommands.Lib
 		{
 			ClassName = classModel.Name;
 			HasBaseClass = classModel.Bases.Count > 0;
+			bool hasPureVirtual = false;
+			bool hasVirtual = false;
 			foreach (var subElement in classModel.Children)
 			{
 				if (subElement is CodeFunction)
@@ -102,22 +110,22 @@ namespace GoToCommands.Lib
 					switch (functionType(subElement as CodeFunction))
 					{
 						case FunctionType.PureVirtual :
-							IsInterface = true;
-							HasDerivedClass = true;
+							hasPureVirtual = true;
+							hasVirtual = true;
 							break;
 						case FunctionType.Virtual:
-							IsInterface = false;
-							HasDerivedClass = true;
+							hasVirtual = true;
 							break;
 						default:
-							IsInterface = false;
-							HasDerivedClass = false;
 							break;
 					}
 
 				}
+				if (hasPureVirtual)
+					break;
 			}
-
+			IsInterface = hasPureVirtual;
+			HasDerivedClass = hasVirtual;
 		}
 
 		private static void invalidClass()
@@ -183,8 +191,6 @@ namespace GoToCommands.Lib
 		private static DateTime _time;
 		private static String _documentName;
 		private static int _lineNumber;
-		private static readonly int _function = 128;
-		private static readonly int _pure = 2048;
-		private static readonly int _virtual = 4096;
+		private static readonly int _overridenMethod = 2097280;
 	}
 }

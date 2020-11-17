@@ -54,6 +54,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Commands\GoToDerived.cs" />
     <Compile Include="Commands\GoToHeaderCode.cs" />
     <Compile Include="Commands\GoToImplementation.cs" />
     <Compile Include="Commands\GoToTestClass.cs" />
