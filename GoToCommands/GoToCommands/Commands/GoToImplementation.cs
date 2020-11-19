@@ -87,7 +87,7 @@ namespace GoToCommands.Commands
 				if (!Utilities.IsHeader(element.ProjectItem.Name))
 					continue;
 
-				var codeClass = getClass(element, _interfaceName);
+				var codeClass = getClass(element);
 				if (codeClass != null)
 				{
 					_dte.ExecuteCommand("File.OpenFile", element.ProjectItem.FileNames[0]);
@@ -97,7 +97,7 @@ namespace GoToCommands.Commands
 			}
 		}
 
-		private CodeClass getClass(CodeElement codeElement, String interfaceName)
+		private CodeClass getClass(CodeElement codeElement)
 		{
 			if (codeElement is CodeClass codeClass)
 			{
@@ -109,7 +109,7 @@ namespace GoToCommands.Commands
 			{
 				foreach (CodeElement element in codeElement.Children)
 				{
-					var classModel = getClass(element, interfaceName);
+					var classModel = getClass(element);
 					if (classModel != null)
 						return classModel;
 				}

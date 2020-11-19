@@ -48,6 +48,7 @@ namespace GoToCommands
             await GoToTestClass.InitializeAsync(this);
 			await GoToImplementation.InitializeAsync(this); 
 			await GoToDerived.InitializeAsync(this); //Comment this line
+			await GoToBase.InitializeAsync(this); //Comment this line
 		}
 
         #endregion

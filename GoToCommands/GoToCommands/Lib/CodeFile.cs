@@ -34,6 +34,7 @@ namespace GoToCommands.Lib
 		public static bool HasBaseClass { get; private set; }
 		public static bool HasDerivedClass { get; private set; }
 		public static String ClassName { get; private set; }
+		public static String BaseClassName { get; private set; }
 		public static ProjectType Project { get; private set; }
 		public static FileType File { get; private set; }
 
@@ -101,6 +102,8 @@ namespace GoToCommands.Lib
 		{
 			ClassName = classModel.Name;
 			HasBaseClass = classModel.Bases.Count > 0;
+			if(HasBaseClass)
+				BaseClassName = classModel.Bases.Item(1).Name;
 			bool hasPureVirtual = false;
 			bool hasVirtual = false;
 			foreach (var subElement in classModel.Children)
