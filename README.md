@@ -6,13 +6,13 @@ This extension is meant to ease the navigation of large C++ repositories by prov
 ## Current Features:
 1. Go To Header / Code - To toggle between header and code files in and outside the VS project
 2. Go To Test / Class - To toggle between the test and the code class for any VS project item
+3. Go to Implementation from interface
+4. Go to Derived Class from Base class
+5. Go to base class from derived class
 
 ## Upcoming Features
 1. Configuration settings to provide paths. Both absolute and relative paths.
 2. Tool Window at the bottom of the screen to handle multiple results
-3. Go to Implementation from interface
-4. Go to Derived Class from Base class
-5. Go to base class from derived class
 
 Feature requests always welcome :)
 
@@ -23,8 +23,12 @@ Feature requests always welcome :)
 4. Class test must contain the name of the file in which the class is present. (Will be extended in the future to contain the name of the class rather than the name of the file in which the class is present)
 5. Currently supports only single class in a file
 6. Might not work for solutions with deeply nested subprojects and solution folders
+7. Multiple classes with the same name under different namespaces may cause issues with Go to implementation, base class and derived class.
 
 ## Version Details:
+1.6 - Go To Implementation.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Go To Base Class.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Go To Derived Class.<br />
 1.5.1&nbsp;&nbsp;- Fixing extension load time issues.  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Fixing Go To Test bug where non header or cpp files could be opened.          
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Fixing Go To Test bug where Go To Test was available for non VS project items.  
