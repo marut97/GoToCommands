@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
   <Metadata>
-    <Identity Id="GoToHeaderCode.b0972157-5bff-40c7-bb8e-25fcaddb13f1" Version="1.5.1" Language="en-US" Publisher="Marut Prasad" />
+    <Identity Id="GoToHeaderCode.b0972157-5bff-40c7-bb8e-25fcaddb13f1" Version="1.6" Language="en-US" Publisher="Marut Prasad" />
     <DisplayName>Go To Commands for C++</DisplayName>
     <Description xml:space="preserve">Navigate between different elements of a C++ solution seemlessly.</Description>
   </Metadata>
