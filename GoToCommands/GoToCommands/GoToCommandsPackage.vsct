@@ -9,51 +9,62 @@
       <Group guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" priority="0x0600">
         <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN" />
       </Group>
+      <Group guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" priority="0x0600">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="MyMenuController" />
+      </Group>
     </Groups>
+
+    <Menus>
+      <Menu guid="guidGoToCommandsPackageCmdSet" id="MyMenuController" type="Menu" priority="0x1000">
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Strings>
+          <ButtonText>Go To ... </ButtonText>
+          <CommandName>Go To ...</CommandName>
+        </Strings>
+      </Menu>
+    </Menus>
 
     <Buttons>
       <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToHeaderCode" priority="0x0100" type="Button">
-        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Go To Header/Source File</ButtonText>
+          <ButtonText>Header/Source File</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToTestClass" priority="0x0100" type="Button">
-        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <CommandFlag>TextChanges</CommandFlag>
         <Strings>
-          <ButtonText>Go To Test/Class</ButtonText>
+          <ButtonText>Test/Class under Test</ButtonText>
         </Strings>
       </Button>
-      <!--Add comment here-->
       <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToImplementation" priority="0x0100" type="Button">
-        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>Go To Implementation</ButtonText>
+          <ButtonText>Implementation</ButtonText>
         </Strings>
       </Button>
-      <!--End here-->
       <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToDerived" priority="0x0100" type="Button">
-        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>Go To Derived Class</ButtonText>
+          <ButtonText>Derived Class</ButtonText>
         </Strings>
       </Button>
       <Button guid="guidGoToCommandsPackageCmdSet" id="cmdidGoToBase" priority="0x0100" type="Button">
-        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommands" />
+        <Parent guid="guidGoToCommandsPackageCmdSet" id="GoToCommandsSubMenu" />
         <CommandFlag>DynamicVisibility</CommandFlag>
         <CommandFlag>DefaultInvisible</CommandFlag>
         <Strings>
-          <ButtonText>Go To Base Class</ButtonText>
+          <ButtonText>Base Class</ButtonText>
         </Strings>
       </Button>
     </Buttons>
@@ -64,7 +75,9 @@
     <GuidSymbol name="guidUIContext" value="{6B4C995A-47FD-4461-90A2-2048B531EBE1}" />
 
     <GuidSymbol name="guidGoToCommandsPackageCmdSet" value="{1eececa1-e0da-4689-bb36-1cfbef669757}">
+      <IDSymbol name="MyMenuController" value="0x1010" />
       <IDSymbol name="GoToCommands" value="0x1020" />
+      <IDSymbol name="GoToCommandsSubMenu" value="0x1030" />
       <IDSymbol name="GoToCommandsId" value="0x0100" />
       <IDSymbol value="4129" name="cmdidGoToHeaderCode" />
       <IDSymbol value="4130" name="cmdidGoToTestClass" />

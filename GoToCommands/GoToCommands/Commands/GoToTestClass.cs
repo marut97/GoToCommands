@@ -39,8 +39,6 @@ namespace GoToCommands.Commands
 			if(_dte != null)
 				DteUtilities.FillProjects(_dte);
 
-			//InitializeProjectsList();
-
             command.BeforeQueryStatus += ButtonStatus;
 
             commandService.AddCommand(command);
@@ -73,21 +71,9 @@ namespace GoToCommands.Commands
             if (_dte == null || !(sender is OleMenuCommand button))
                 return;
 
-			//         var filePath = _dte.ActiveDocument.FullName;
-			//if (_dte.ActiveDocument.ProjectItem == null)
-			//{
-			//	button.Visible = false;
-			//	return;
-			//}
-			//         var projectName = _dte.ActiveDocument.ProjectItem.ContainingProject.Name;
-			//if (!Utilities.IsInVSProject(projectName))
-			//{
-			//	button.Visible = false;
-			//	return;
-			//}
 			CodeFile.set(_dte.ActiveDocument);
 			button.Visible = CodeFile.Project != CodeFile.ProjectType.None && CodeFile.File != CodeFile.FileType.Invalid ;
-            button.Text = CodeFile.Project == CodeFile.ProjectType.Test ? "Go To Class" : "Go To Test";
+            button.Text = CodeFile.Project == CodeFile.ProjectType.Test ? "Class under Test" : "Test Class";
         }
 
         private void Execute(object sender, EventArgs e)

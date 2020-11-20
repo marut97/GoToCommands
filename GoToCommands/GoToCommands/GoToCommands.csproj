@@ -176,7 +176,6 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Commands\Resources\GoToBase.png" />
     <Content Include="Resources\GoToCommandsPackage.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
