@@ -64,7 +64,7 @@ namespace GoToCommands.Commands
 
 			CodeFile.set(_dte.ActiveDocument);
             button.Visible = CodeFile.File == CodeFile.FileType.Header || CodeFile.File == CodeFile.FileType.Source;
-            button.Text = CodeFile.File == CodeFile.FileType.Source ? "Source File" : "Header File";
+            button.Text = CodeFile.File == CodeFile.FileType.Source ? "Header File" : "Source File";
         }
 
         private void Execute(object sender, EventArgs e)

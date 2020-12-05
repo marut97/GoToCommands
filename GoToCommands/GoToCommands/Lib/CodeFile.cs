@@ -43,13 +43,12 @@ namespace GoToCommands.Lib
 			if (!reset(document))
 				return;
 
-			_time = DateTime.Now;
 			_documentName = document.FullName;
 
 			ClassName = "";
 
+			setFileType(document.FullName);
 			setProjectType(document);
-			setFileType(document.Name);
 			setClassType(document);
 		}
 
@@ -166,7 +165,7 @@ namespace GoToCommands.Lib
 		{
 			if (document.Selection is TextSelection selection)
 			{
-				return !((DateTime.Now - _time < TimeSpan.FromSeconds(3)) && (document.FullName == _documentName) && (selection.ActivePoint.Line == _lineNumber));
+				return !((document.FullName == _documentName) && (selection.ActivePoint.Line == _lineNumber));
 			}
 			return true;
 		}
@@ -191,7 +190,6 @@ namespace GoToCommands.Lib
 			return null;
 		}
 
-		private static DateTime _time;
 		private static String _documentName;
 		private static int _lineNumber;
 		private static readonly int _overridenMethod = 2097280;
