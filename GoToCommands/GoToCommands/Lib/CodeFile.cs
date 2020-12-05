@@ -44,7 +44,7 @@ namespace GoToCommands.Lib
 				return;
 
 			_documentName = document.FullName;
-
+			_lineNumber = 1;
 			ClassName = "";
 
 			setFileType(document.FullName);
