@@ -26,6 +26,7 @@ Feature requests always welcome :)
 7. Multiple classes with the same name under different namespaces may cause issues with Go to implementation, base class and derived class.
 
 ## Version Details:
+1.6.1&nbsp;&nbsp;- Fixing bugs. 
 1.6 - Go To Implementation.<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Go To Base Class.<br />
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Go To Derived Class.<br />
